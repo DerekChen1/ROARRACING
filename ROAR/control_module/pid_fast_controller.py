@@ -97,14 +97,14 @@ class PIDFastController(Controller):
                 throttle = 1
                 brake = 0
         elif self.region == 3:
-            brakeThreshold = 8.5
+            brakeThreshold = 8
             waypoint = self.waypoint_queue_braking[0]
             dist = self.agent.vehicle.transform.location.distance(waypoint.location)
-            if dist <= brakeThreshold and current_speed > 70:
+            if dist <= brakeThreshold and current_speed > 72.5:
                 throttle = -1
                 brake = 1
                 self.brake_counter = 1
-            elif sharp_error >= 0.67 and current_speed > 77.5:
+            elif sharp_error >= 0.65 and current_speed > 80:
                 throttle = -1
                 brake = 1
             
