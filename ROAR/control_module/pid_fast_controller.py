@@ -91,7 +91,7 @@ class PIDFastController(Controller):
                 throttle = 0
                 brake = 0.75
             elif wide_error > 0.16 and current_speed > 95: # wide turn
-                throttle = max(0, 1 - 6*pow(wide_error + current_speed*0.0029, 6))
+                throttle = max(0, 1 - 6*pow(wide_error + current_speed*0.0027, 6))
                 brake = 0
             else:
                 throttle = 1
