@@ -66,7 +66,7 @@ class PIDFastController(Controller):
         pitch = float(next_waypoint.record().split(",")[4])
 
         if self.region == 1:
-            if sharp_error < 0.67 or current_speed <= 100:
+            if sharp_error < 0.67 or current_speed <= 105:
                 throttle = 1
                 brake = 0
             else:
@@ -75,7 +75,7 @@ class PIDFastController(Controller):
         elif self.region == 2:
             waypoint = self.waypoint_queue_braking[0] # 5012 is weird bump spot
             dist = self.agent.vehicle.transform.location.distance(waypoint.location)
-            if dist <= 5:
+            if dist <= 4:
                 self.brake_counter = 1
                 # print(self.waypoint_queue_braking[0])
                 self.waypoint_queue_braking.pop(0)
