@@ -3,8 +3,6 @@ from matplotlib.pyplot import close
 from pydantic import BaseModel, Field
 from ROAR.control_module.controller import Controller
 from ROAR.utilities_module.vehicle_models import VehicleControl, Vehicle
-# import keyboard
-
 from ROAR.utilities_module.data_structures_models import Transform, Location, Rotation
 from collections import deque
 import numpy as np
