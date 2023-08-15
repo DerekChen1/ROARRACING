@@ -95,6 +95,13 @@ class PIDFastController(Controller):
                 throttle = 1
                 brake = 0
         elif self.region == 3:
+            if wide_error > 0.06 and current_speed > 105: # wide turn
+                throttle = max(0, 1 - 6*pow(wide_error + current_speed*0.0022, 6))
+                brake = 0
+            else:
+                throttle = 1
+                brake = 0
+        elif self.region == 4:
             brakeThreshold = 7.5
             waypoint = self.waypoint_queue_braking[0]
             dist = self.agent.vehicle.transform.location.distance(waypoint.location)
