@@ -3,8 +3,6 @@ from matplotlib.pyplot import close
 from pydantic import BaseModel, Field
 from ROAR.control_module.controller import Controller
 from ROAR.utilities_module.vehicle_models import VehicleControl, Vehicle
-# import keyboard
-
 from ROAR.utilities_module.data_structures_models import Transform, Location, Rotation
 from collections import deque
 import numpy as np
@@ -68,7 +66,7 @@ class PIDFastController(Controller):
         pitch = float(next_waypoint.record().split(",")[4])
 
         if self.region == 1:
-            if sharp_error < 0.68 or current_speed <= 90:
+            if sharp_error < 0.66 or current_speed <= 105:
                 throttle = 1
                 brake = 0
             else:
@@ -77,7 +75,7 @@ class PIDFastController(Controller):
         elif self.region == 2:
             waypoint = self.waypoint_queue_braking[0] # 5012 is weird bump spot
             dist = self.agent.vehicle.transform.location.distance(waypoint.location)
-            if dist <= 5:
+            if dist <= 4:
                 self.brake_counter = 1
                 # print(self.waypoint_queue_braking[0])
                 self.waypoint_queue_braking.pop(0)
@@ -85,20 +83,48 @@ class PIDFastController(Controller):
                 throttle = -1
                 brake = 1
                 self.brake_counter += 1
-                if self.brake_counter >= 4:
+                if self.brake_counter >= 3:
                     self.brake_counter = 0
-            elif sharp_error >= 0.67 and current_speed > 70:
+            elif sharp_error >= 0.85 and current_speed > 75:
                 throttle = 0
-                brake = 0.4
-            elif wide_error > 0.09 and current_speed > 92: # wide turn
-                throttle = max(0, 1 - 6*pow(wide_error + current_speed*0.003, 6))
+                brake = 0.7
+            elif wide_error > 0.1625 and current_speed > 95: # wide turn
+                throttle = max(0, 1 - 6*pow(wide_error + current_speed*0.002525, 6))
                 brake = 0
             else:
                 throttle = 1
                 brake = 0
+        elif self.region == 3:
+            if wide_error > 0.06 and current_speed > 105: # wide turn
+                throttle = max(0, 1 - 6*pow(wide_error + current_speed*0.002125, 6))
+                brake = 0
+            else:
+                throttle = 1
+                brake = 0
+        elif self.region == 4:
+            brakeThreshold = 6.5
+            waypoint = self.waypoint_queue_braking[0]
+            dist = self.agent.vehicle.transform.location.distance(waypoint.location)
+            if dist <= brakeThreshold and current_speed > 70:
+                throttle = -1
+                brake = 1
+                self.brake_counter = 1
+            elif sharp_error >= 0.625 and current_speed > 80:
+                throttle = -1
+                brake = 1
+            
+            elif wide_error > 0.325 and current_speed > 105: # wide turn
+                throttle = max(0, 1 - 6*pow(wide_error + current_speed*0.0019, 6))
+                brake = 0
+            else:
+                throttle = 1
+                brake = 0
+                if dist > brakeThreshold and self.brake_counter == 1:
+                    self.waypoint_queue_braking.pop(0)
+                    self.brake_counter = 0
         
         gear = max(1, (int)((current_speed - 2*pitch) / 60))
-        if throttle == -1:
+        if throttle < 0:
             gear = -1
         
         waypoint = self.waypoint_queue_region[0]
