@@ -66,7 +66,7 @@ class PIDFastController(Controller):
         pitch = float(next_waypoint.record().split(",")[4])
 
         if self.region == 1:
-            if sharp_error < 0.67 or current_speed <= 105:
+            if sharp_error < 0.66 or current_speed <= 105:
                 throttle = 1
                 brake = 0
             else:
